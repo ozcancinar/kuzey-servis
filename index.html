@@ -2,568 +2,513 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kuzey Teknik - Servis Takip</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Kuzey İletişim - Teknik Servis Takip</title>
     
-    <link rel="apple-touch-icon" sizes="180x180" href="https://img.gs/jgkmxkwyfm/180/https://raw.githubusercontent.com/otuncman/kuzey-assets/main/logo.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="https://img.gs/jgkmxkwyfm/32/https://raw.githubusercontent.com/otuncman/kuzey-assets/main/logo.png">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Kuzey Teknik"> <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
     <style>
-        @media print {
-            body * { visibility: hidden; }
-            #prizone, #prizone * { visibility: visible; }
-            #prizone { position: absolute; left: 0; top: 0; width: 80mm; }
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
-        .safe-bottom { padding-bottom: calc(env(safe-area-inset-bottom) + 5rem); }
-        /* Kurumsal İkon Tasarımı (iOS/Android için) */
-        :root { --pwa-icon: url('https://raw.githubusercontent.com/otuncman/kuzey-assets/main/logo.png'); }
+        /* PWA Modu ve Yazdırma Ayarları */
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white; color: black; }
+            #printReceiptArea { width: 80mm; max-width: 80mm; margin: 0; padding: 0; }
+        }
+        /* Özel kaydırma çubuğu gizleme */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body class="bg-gray-100 font-sans text-gray-800 antialiased safe-bottom">
+<body class="bg-gray-50 text-gray-900 antialiased selection:bg-red-500 selection:text-white">
 
-    <header class="bg-red-600 text-white p-4 shadow-lg flex justify-between items-center sticky top-0 z-40">
-        <h1 class="text-lg font-extrabold tracking-wider flex items-center">
-            <img src="https://raw.githubusercontent.com/otuncman/kuzey-assets/main/logo.png" class="h-6 w-6 mr-2.5 rounded-md shadow-inner" alt="Kuzey Teknik">
-            KUZEY TEKNİK <span class="font-normal text-red-100 text-[10px] ml-1.5 opacity-80">- Servis</span>
-        </h1>
-        <span id="pageTitle" class="text-xs bg-white text-red-600 px-2.5 py-1 rounded-full font-bold shadow-sm">Yeni Kayıt</span>
-    </header>
-
-    <main class="max-w-md mx-auto p-4">
+    <div class="max-w-md mx-auto bg-white min-h-screen shadow-2xl flex flex-col relative pb-20">
         
-        <section id="tab-new-record" class="space-y-4 tab-content">
-            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200">
-                <h2 class="text-lg font-bold text-gray-800 mb-4 flex items-center border-b pb-2 border-gray-100">
-                    <i class="fa-solid fa-square-plus text-red-600 mr-2"></i>Müşteri ve Cihaz Girişi
-                </h2>
-                <form id="recordForm" class="space-y-4">
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Müşteri Adı Soyadı</label>
-                        <input type="text" id="customerName" required class="w-full p-3 border border-gray-300 rounded-xl bg-gray-50 focus:bg-white focus:border-red-500 outline-none transition">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Telefon Numarası</label>
-                        <input type="tel" id="customerPhone" placeholder="05xx xxx xx xx" required class="w-full p-3 border border-gray-300 rounded-xl bg-gray-50 focus:bg-white focus:border-red-500 outline-none transition">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Cihaz Model / Marka</label>
-                        <input type="text" id="deviceModel" placeholder="Örn: iPhone 14 Pro" required class="w-full p-3 border border-gray-300 rounded-xl bg-gray-50 focus:bg-white focus:border-red-500 outline-none transition">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Bildirilen Arıza / Yapılan İşlem</label>
-                        <textarea id="deviceFault" rows="2" required class="w-full p-3 border border-gray-300 rounded-xl bg-gray-50 focus:bg-white focus:border-red-500 outline-none transition"></textarea>
-                    </div>
-                    <div class="grid grid-cols-2 gap-3">
+        <header class="bg-red-700 text-white px-4 py-4 sticky top-0 z-40 shadow-md flex justify-between items-center no-print">
+            <div class="flex items-center gap-2">
+                <div class="bg-white/10 p-2 rounded-xl backdrop-blur-md">
+                    <i class="fa-solid fa-screwdrivers-wrench text-xl text-red-100"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg tracking-tight">KUZEY TEKNİK</h1>
+                    <p class="text-xs text-red-200 font-medium">Servis Takip Sistemi v2.5</p>
+                </div>
+            </div>
+            <button onclick="openTab('kasa')" class="bg-white/10 hover:bg-white/20 text-white font-semibold px-3 py-1.5 rounded-xl text-xs backdrop-blur-md transition-all flex items-center gap-1">
+                <i class="fa-solid fa-chart-pie"></i> Raporlar
+            </button>
+        </header>
+
+        <main class="flex-1 p-4 no-print overflow-y-auto">
+            
+            <section id="tab-yeni" class="tab-content space-y-4">
+                <div class="bg-gray-50 border border-gray-100 p-4 rounded-2xl">
+                    <h2 class="font-bold text-gray-800 mb-3 flex items-center gap-2 text-base">
+                        <i class="fa-solid fa-user-plus text-red-600"></i> Müşteri ve Cihaz Bilgileri
+                    </h2>
+                    <form id="serviceForm" onsubmit="saveRecord(event)" class="space-y-3.5">
                         <div>
-                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Fiyat (TL)</label>
-                            <input type="number" id="price" placeholder="0" class="w-full p-3 border border-gray-300 rounded-xl bg-gray-50 focus:bg-white focus:border-red-500 outline-none transition">
+                            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Müşteri Adı Soyadı</label>
+                            <input type="text" id="mName" required placeholder="Örn: Ahmet Yılmaz" class="w-full bg-white border border-gray-200 rounded-xl px-3.5 py-3 text-sm focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-100 transition-all font-medium">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Giriş Zamanı</label>
-                            <input type="datetime-local" id="entryDate" required class="w-full p-3 border border-gray-300 rounded-xl bg-gray-50 font-mono text-sm outline-none">
+                            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Telefon Numarası</label>
+                            <input type="tel" id="mTel" required placeholder="Örn: 0505 468 99 82" class="w-full bg-white border border-gray-200 rounded-xl px-3.5 py-3 text-sm focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-100 transition-all font-medium">
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Cihaz Modeli</label>
+                                <input type="text" id="mDevice" required placeholder="Örn: iPhone 12 Pro" class="w-full bg-white border border-gray-200 rounded-xl px-3.5 py-3 text-sm focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-100 transition-all font-medium">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Tahmini Fiyat (TL)</label>
+                                <input type="number" id="mPrice" required placeholder="Örn: 2500" class="w-full bg-white border border-gray-200 rounded-xl px-3.5 py-3 text-sm focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-100 transition-all font-medium">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Arıza / Yapılacak İşlem</label>
+                            <textarea id="mProblem" required rows="2" placeholder="Örn: Ekran Değişimi ve Batarya Yenileme" class="w-full bg-white border border-gray-200 rounded-xl px-3.5 py-3 text-sm focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-100 transition-all font-medium resize-none"></textarea>
+                        </div>
+                        <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-red-100 hover:shadow-xl transition-all flex justify-center items-center gap-2 text-sm mt-2 cursor-pointer">
+                            <i class="fa-solid fa-cloud-arrow-up"></i> KAYDET VE FİŞ ÜRET
+                        </button>
+                    </form>
+                </div>
+            </section>
+
+            <section id="tab-cihazlar" class="tab-content hidden space-y-3">
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-gray-400">
+                        <i class="fa-solid fa-magnifying-glass text-sm"></i>
+                    </span>
+                    <input type="text" id="searchInput" oninput="filterRecords()" placeholder="İsim, cihaz, arıza veya ID ile ara..." class="w-full bg-gray-100 border border-transparent rounded-2xl pl-10 pr-4 py-3 text-sm focus:outline-none focus:bg-white focus:border-gray-200 focus:ring-2 focus:ring-gray-100 transition-all font-medium">
+                </div>
+
+                <div id="cardsContainer" class="space-y-3">
+                    </div>
+            </section>
+
+            <section id="tab-musteriler" class="tab-content hidden space-y-3">
+                <h2 class="font-bold text-gray-800 text-base px-1"><i class="fa-solid fa-users text-red-600 mr-1"></i> Kayıtlı Müşteri Havuzu</h2>
+                <div id="customersContainer" class="space-y-2">
+                    </div>
+            </section>
+
+            <section id="tab-kasa" class="tab-content hidden space-y-4">
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="bg-gradient-to-br from-green-600 to-emerald-700 text-white p-4 rounded-2xl shadow-sm">
+                        <p class="text-xs text-green-100 font-semibold uppercase tracking-wider">Bugünkü Ciro</p>
+                        <h3 id="statsTodayCiro" class="text-xl font-bold mt-1">0 TL</h3>
+                    </div>
+                    <div class="bg-gradient-to-br from-blue-600 to-indigo-700 text-white p-4 rounded-2xl shadow-sm">
+                        <p class="text-xs text-blue-100 font-semibold uppercase tracking-wider">Aylık Toplam Ciro</p>
+                        <h3 id="statsMonthCiro" class="text-xl font-bold mt-1">0 TL</h3>
+                    </div>
+                    <div class="bg-gradient-to-br from-amber-500 to-orange-600 text-white p-4 rounded-2xl shadow-sm">
+                        <p class="text-xs text-amber-100 font-semibold uppercase tracking-wider">Bekleyen Cihaz</p>
+                        <h3 id="statsPendingCount" class="text-xl font-bold mt-1">0 Adet</h3>
+                    </div>
+                    <div class="bg-gradient-to-br from-purple-600 to-fuchsia-700 text-white p-4 rounded-2xl shadow-sm">
+                        <p class="text-xs text-purple-100 font-semibold uppercase tracking-wider">Tamamlanan</p>
+                        <h3 id="statsCompletedCount" class="text-xl font-bold mt-1">0 Adet</h3>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 border border-gray-100 p-4 rounded-2xl">
+                    <h3 class="font-bold text-gray-800 mb-3 text-sm flex items-center justify-between">
+                        <span><i class="fa-solid fa-list-check text-emerald-600 mr-1"></i> Son Tahsilatlar & İadeler</span>
+                        <span class="text-xs text-gray-400 font-normal">Canlı Senkronize</span>
+                    </h3>
+                    <div id="financialLogsContainer" class="space-y-2 max-h-64 overflow-y-auto no-scrollbar">
+                        </div>
+                </div>
+            </section>
+
+        </main>
+
+        <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white border-t border-gray-100 h-16 flex items-center justify-around px-2 z-40 no-print shadow-[0_-4px_12px_rgba(0,0,0,0.03)]">
+            <button onclick="openTab('yeni')" id="nav-yeni" class="flex flex-col items-center justify-center text-red-600 flex-1 h-full transition-all">
+                <i class="fa-solid fa-square-plus text-xl mb-0.5"></i>
+                <span class="text-[10px] font-bold tracking-tight">Yeni</span>
+            </button>
+            <button onclick="openTab('cihazlar')" id="nav-cihazlar" class="flex flex-col items-center justify-center text-gray-400 flex-1 h-full transition-all">
+                <i class="fa-solid fa-list-check text-xl mb-0.5"></i>
+                <span class="text-[10px] font-bold tracking-tight">Cihazlar</span>
+            </button>
+            <button onclick="openTab('musteriler')" id="nav-musteriler" class="flex flex-col items-center justify-center text-gray-400 flex-1 h-full transition-all">
+                <i class="fa-solid fa-users text-xl mb-0.5"></i>
+                <span class="text-[10px] font-bold tracking-tight">Müşteriler</span>
+            </button>
+            <button onclick="openTab('kasa')" id="nav-kasa" class="flex flex-col items-center justify-center text-gray-400 flex-1 h-full transition-all">
+                <i class="fa-solid fa-wallet text-xl mb-0.5"></i>
+                <span class="text-[10px] font-bold tracking-tight">Kasa</span>
+            </button>
+        </nav>
+
+        <div id="printModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 no-print">
+            <div class="bg-white w-full max-w-sm rounded-3xl p-4 shadow-2xl flex flex-col max-h-[90vh]">
+                
+                <div class="flex justify-between items-center pb-2 border-b border-gray-100 mb-3">
+                    <h3 class="font-bold text-gray-800 text-sm flex items-center gap-1.5">
+                        <i class="fa-solid fa-receipt text-red-600"></i> Servis Alındı Fişi (80mm)
+                    </h3>
+                    <button onclick="closePrintModal()" class="text-gray-400 hover:text-gray-600 text-lg p-1"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+
+                <div class="flex-1 overflow-y-auto no-scrollbar border border-gray-100 p-2 rounded-2xl bg-gray-50/50">
+                    <div id="printReceiptArea" class="bg-white p-4 text-black text-xs font-mono border border-gray-200 shadow-sm mx-auto rounded-xl" style="width: 100%; max-width: 80mm; font-family: 'Courier New', Courier, monospace;">
+                        <div class="text-center border-b border-dashed border-gray-400 pb-3 mb-3">
+                            <h2 class="font-bold text-sm tracking-wider uppercase" style="font-size: 14px; font-weight: bold; margin-bottom: 2px;">KUZEY TEKNİK</h2>
+                            <p style="font-size: 11px; margin-bottom: 4px;">Teknik Servis Alındı Belgesi</p>
+                        </div>
+                        <div class="space-y-1.5">
+                            <p><strong>Tarih:</strong> <span id="fTarih"></span></p>
+                            <p><strong>Fiş No:</strong> <span id="fNo" class="font-bold"></span></p>
+                            <div class="border-b border-dashed border-gray-300 my-2"></div>
+                            <p><strong>Müşteri:</strong> <span id="fMusteri"></span></p>
+                            <p><strong>Tel:</strong> <span id="fTel"></span></p>
+                            <p><strong>Cihaz:</strong> <span id="fCihaz"></span></p>
+                            <p><strong>Arıza:</strong> <span id="fAriza"></span></p>
+                            <div class="border-b border-dashed border-gray-300 my-2"></div>
+                            <p class="text-right font-bold text-sm" style="font-size: 13px;">Fiyat: <span id="fTutar"></span> TL</p>
+                        </div>
+                        <div class="text-center border-t border-dashed border-gray-400 pt-3 mt-3 space-y-1 text-[10px]" style="font-size: 10px; color: #333;">
+                            <p>Cihaz tesliminde fiş ibrazı zorunludur.</p>
+                            <p class="font-bold">Güvenilir Teknik Servis!</p>
+                            <p><i class="fa-brands fa-instagram"></i> @kuzeyiletisim</p>
+                            <p><i class="fa-solid fa-phone"></i> 0537 589 00 39</p>
                         </div>
                     </div>
-                    <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-red-100 transition flex justify-center items-center tracking-wider">
-                        <i class="fa-solid fa-print mr-2"></i>KAYDET VE FİŞ ÜRET
+                </div>
+                <div class="flex flex-col gap-2 pt-3 mt-2 border-t border-gray-50">
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="closePrintModal()" class="bg-gray-100 text-gray-600 font-bold py-3 rounded-xl text-sm transition-all active:scale-95 cursor-pointer">
+                            Kapat
+                        </button>
+                        <button onclick="window.print()" class="bg-black text-white font-bold py-3 rounded-xl text-sm flex justify-center items-center gap-1.5 transition-all active:scale-95 cursor-pointer">
+                            <i class="fa-solid fa-print"></i> Yazdır
+                        </button>
+                    </div>
+                    
+                    <button onclick="sendFisPDF()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3.5 rounded-xl text-sm flex justify-center items-center gap-2 shadow-lg shadow-green-100 transition-all active:scale-95 w-full cursor-pointer">
+                        <i class="fa-brands fa-whatsapp text-lg"></i> WhatsApp PDF ile Gönder
                     </button>
-                </form>
-            </div>
-        </section>
-
-        <section id="tab-records-list" class="space-y-4 tab-content hidden">
-            <div class="relative">
-                <i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-gray-400"></i>
-                <input type="text" id="searchRecords" placeholder="İsim, cihaz, arıza veya ID ile ara..." class="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl shadow-sm outline-none focus:border-red-500">
-            </div>
-            <div id="recordsListContainer" class="space-y-3"></div>
-        </section>
-
-        <section id="tab-customers-list" class="space-y-4 tab-content hidden">
-            <div class="relative">
-                <i class="fa-solid fa-user-gear absolute left-4 top-3.5 text-gray-400"></i>
-                <input type="text" id="searchCustomers" placeholder="Müşteri ismi veya telefon yazın..." class="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl shadow-sm outline-none focus:border-red-500">
-            </div>
-            <div id="customersListContainer" class="space-y-2"></div>
-        </section>
-
-        <section id="tab-reports" class="space-y-4 tab-content hidden">
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-200 space-y-3">
-                <h3 class="font-bold text-gray-800 text-sm flex items-center"><i class="fa-solid fa-calendar-days text-red-600 mr-2"></i>Tarih Aralığı Seçin</h3>
-                <div class="grid grid-cols-2 gap-2 text-xs">
-                    <div>
-                        <label class="block text-gray-500 font-semibold mb-1">Başlangıç</label>
-                        <input type="date" id="reportStartDate" class="w-full p-2.5 border rounded-xl outline-none focus:border-red-500">
-                    </div>
-                    <div>
-                        <label class="block text-gray-500 font-semibold mb-1">Bitiş</label>
-                        <input type="date" id="reportEndDate" class="w-full p-2.5 border rounded-xl outline-none focus:border-red-500">
-                    </div>
                 </div>
-                <div class="grid grid-cols-3 gap-2 pt-1">
-                    <button onclick="setReportRange('today')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold py-2 rounded-lg transition">Bugün</button>
-                    <button onclick="setReportRange('week')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold py-2 rounded-lg transition">Bu Hafta</button>
-                    <button onclick="setReportRange('month')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold py-2 rounded-lg transition">Bu Ay</button>
-                </div>
-                <button onclick="generateReport()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-xl text-sm transition mt-1 shadow-md shadow-red-100">
-                    <i class="fa-solid fa-chart-line mr-1.5"></i>Raporu Hesapla
-                </button>
-            </div>
 
-            <div class="grid grid-cols-2 gap-3">
-                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-200 text-center">
-                    <span class="text-xs font-bold text-gray-400 uppercase">Toplam Ciro</span>
-                    <p id="totalRevenueText" class="text-xl font-black text-green-600 mt-1">0 TL</p>
-                </div>
-                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-200 text-center">
-                    <span class="text-xs font-bold text-gray-400 uppercase">Tamir Edilen</span>
-                    <p id="totalDevicesText" class="text-xl font-black text-gray-800 mt-1">0 Adet</p>
-                </div>
-            </div>
-
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-200 space-y-2">
-                <h3 class="font-bold text-gray-800 text-sm flex items-center border-b pb-2 border-gray-100">
-                    <i class="fa-solid fa-chart-simple text-red-600 mr-2"></i>Günlük Ciro Dağılımı (TL)
-                </h3>
-                <div class="relative w-full h-48 flex items-center justify-center">
-                    <canvas id="revenueChart"></canvas>
-                </div>
-            </div>
-        </section>
-
-    </main>
-
-    <div id="printModal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl space-y-4">
-            <div class="flex justify-between items-center border-b pb-2">
-                <span class="font-bold text-gray-800">Servis Alındı Fişi (80mm)</span>
-                <button onclick="closePrintModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
-            </div>
-            
-            <div id="prizone" class="bg-white p-2 font-mono text-xs text-black space-y-3 mx-auto" style="width: 80mm;">
-                <div class="text-center border-b pb-2 border-black border-dashed">
-                    <p class="font-bold text-sm">KUZEY TEKNİK</p>
-                    <p class="text-[10px]">Teknik Servis Alındı Belgesi</p>
-                </div>
-                <div class="space-y-1 text-[11px]">
-                    <p><strong>Tarih:</strong> <span id="fTarih"></span></p>
-                    <p><strong>Fiş No:</strong> <span id="fNo"></span></p>
-                    <hr class="border-black border-dashed my-1">
-                    <p><strong>Müşteri:</strong> <span id="fMusteri"></span></p>
-                    <p><strong>Tel:</strong> <span id="fTel"></span></p>
-                    <p><strong>Cihaz:</strong> <span id="fCihaz"></span></p>
-                    <p><strong>Arıza:</strong> <span id="fAriza"></span></p>
-                    <hr class="border-black border-dashed my-1">
-                    <p><strong>Fiyat:</strong> <span id="fTutar"></span> TL</p>
-                </div>
-                <div class="text-center border-t pt-2 border-black border-dashed text-[10px] leading-tight space-y-1">
-                    <p>Cihaz tesliminde fiş ibrazı zorunludur.</p>
-                    <p class="font-bold pt-1 opacity-80 text-gray-700">Güvenilir Teknik Servis!</p>
-                    <div class="text-[9px] pt-1 text-gray-700 space-y-0.5 font-sans">
-                        <p><i class="fa-brands fa-instagram text-red-600"></i> @kuzeyiletisim</p>
-                        <p><i class="fa-solid fa-phone text-red-600"></i> 0537 589 00 39</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-2 gap-3 pt-2">
-                <button onclick="closePrintModal()" class="bg-gray-200 text-gray-700 font-bold py-2.5 rounded-xl text-sm">Kapat</button>
-                <button onclick="window.print()" class="bg-black text-white font-bold py-2.5 rounded-xl text-sm flex justify-center items-center">
-                    <i class="fa-solid fa-print mr-2"></i>Yazdır
-                </button>
             </div>
         </div>
+
     </div>
 
-    <div id="historyModal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-md w-full p-5 shadow-2xl flex flex-col max-h-[80vh]">
-            <div class="flex justify-between items-center border-b pb-3 mb-3">
-                <div>
-                    <h3 id="historyModalTitle" class="font-bold text-gray-800 text-base">Müşteri Geçmişi</h3>
-                    <p id="historyModalSub" class="text-xs text-gray-500"></p>
-                </div>
-                <button onclick="closeHistoryModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
-            </div>
-            <div id="historyModalContent" class="space-y-3 overflow-y-auto pr-1 flex-1"></div>
-            <button onclick="closeHistoryModal()" class="w-full mt-4 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-2.5 rounded-xl text-sm">Pencereyi Kapat</button>
-        </div>
-    </div>
+    <script>
+        let records = [];
 
-    <div id="editModal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl space-y-4">
-            <div class="flex justify-between items-center border-b pb-2">
-                <span class="font-bold text-gray-800">Kayıt Düzenle</span>
-                <button onclick="closeEditModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
-            </div>
-            <form id="editForm" class="space-y-3 text-xs">
-                <input type="hidden" id="editDocId">
-                <input type="hidden" id="editContext">
-                <input type="hidden" id="editPhoneRef">
-                <div>
-                    <label class="block text-gray-500 font-bold mb-1 uppercase">Müşteri / Cihaz</label>
-                    <p id="editInfoText" class="font-semibold text-gray-800 bg-gray-50 p-2 rounded-lg border"></p>
-                </div>
-                <div>
-                    <label class="block text-gray-500 font-bold mb-1 uppercase">Arıza / Yapılan İşlem</label>
-                    <textarea id="editFault" rows="3" required class="w-full p-2.5 border rounded-xl outline-none focus:border-red-500 text-sm"></textarea>
-                </div>
-                <div>
-                    <label class="block text-gray-500 font-bold mb-1 uppercase">Fiyat (TL)</label>
-                    <input type="number" id="editPrice" required class="w-full p-2.5 border rounded-xl outline-none focus:border-red-500 text-sm font-bold">
-                </div>
-                <div class="grid grid-cols-2 gap-3 pt-2">
-                    <button type="button" onclick="closeEditModal()" class="bg-gray-100 text-gray-700 font-bold py-2.5 rounded-xl">Vazgeç</button>
-                    <button type="submit" class="bg-red-600 text-white font-bold py-2.5 rounded-xl shadow-md">Değişiklikleri Kaydet</button>
-                </div>
-            </form>
-        </div>
-    </div>
+        const initialMockData = [
+            { id: "KZY-598430", date: "2026-05-26 11:23", customer: "Gürkan TEB Banka", tel: "05054689982", device: "Xiaomi Pad 5", problem: "Ekran Değişimi", price: 2500, status: "Bekliyor", type: "Tahsilat" },
+            { id: "KZY-758271", date: "2026-05-25 14:10", customer: "Merve Yılmaz", tel: "05439876543", device: "iPhone 11", problem: "Batarya Değişimi", price: 1200, status: "Tamamlandı", type: "Tahsilat" }
+        ];
 
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-xl z-40">
-        <div class="max-w-md mx-auto grid grid-cols-4 h-16">
-            <button onclick="switchTab('new-record', 'Yeni Kayıt')" id="btn-tab-new-record" class="flex flex-col items-center justify-center text-red-600 font-bold transition">
-                <i class="fa-solid fa-square-plus text-lg mb-0.5"></i>
-                <span class="text-[10px]">Yeni</span>
-            </button>
-            <button onclick="switchTab('records-list', 'Kayıt Listesi')" id="btn-tab-records-list" class="flex flex-col items-center justify-center text-gray-400 font-semibold transition">
-                <i class="fa-solid fa-rectangle-list text-lg mb-0.5"></i>
-                <span class="text-[10px]">Cihazlar</span>
-            </button>
-            <button onclick="switchTab('customers-list', 'Müşteri Havuzu')" id="btn-tab-customers-list" class="flex flex-col items-center justify-center text-gray-400 font-semibold transition">
-                <i class="fa-solid fa-users text-lg mb-0.5"></i>
-                <span class="text-[10px]">Müşteriler</span>
-            </button>
-            <button onclick="switchTab('reports', 'Ciro ve Raporlama')" id="btn-tab-reports" class="flex flex-col items-center justify-center text-gray-400 font-semibold transition">
-                <i class="fa-solid fa-chart-pie text-lg mb-0.5"></i>
-                <span class="text-[10px]">Kasa</span>
-            </button>
-        </div>
-    </nav>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-        const firebaseConfig = {
-          apiKey: "AIzaSyAvfzwlLNv8K71NLLMo-nEQt2ESQEXXuxI",
-          authDomain: "kuzey-servis.firebaseapp.com",
-          projectId: "kuzey-servis",
-          storageBucket: "kuzey-servis.firebasestorage.app",
-          messagingSenderId: "190809402093",
-          appId: "1:190809402093:web:cfb45dfcd139569cfb3ae4"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const recordsCol = collection(db, "servis_kayitlari");
-
-        let globalRecords = [];
-        let myChart = null;
-
-        const q = query(recordsCol, orderBy("timestamp", "desc"));
-        onSnapshot(q, (snapshot) => {
-            globalRecords = [];
-            snapshot.forEach((doc) => {
-                globalRecords.push({ docId: doc.id, ...doc.data() });
-            });
-            
-            if(!document.getElementById('tab-records-list').classList.contains('hidden')) renderRecords(document.getElementById('searchRecords').value);
-            if(!document.getElementById('tab-customers-list').classList.contains('hidden')) renderCustomers(document.getElementById('searchCustomers').value);
-            if(!document.getElementById('tab-reports').classList.contains('hidden')) generateReport();
-        });
-
-        // Form Gönderme
-        document.getElementById('recordForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const newRecord = {
-                id: 'KZY-' + Math.floor(100000 + Math.random() * 900000),
-                name: document.getElementById('customerName').value.trim(),
-                phone: document.getElementById('customerPhone').value.trim(),
-                model: document.getElementById('deviceModel').value.trim(),
-                fault: document.getElementById('deviceFault').value.trim(),
-                price: document.getElementById('price').value || '0',
-                date: document.getElementById('entryDate').value.replace('T', ' '),
-                status: 'Bekliyor',
-                timestamp: Date.now()
-            };
-            try {
-                await addDoc(recordsCol, newRecord);
-                this.reset();
-                setNow();
-                openPrintModal(newRecord);
-            } catch (error) { alert("Hata: " + error.message); }
-        });
-
-        // Durum Değiştirme Fonksiyonu
-        window.toggleStatus = async function(docId, context, phoneRef = '') {
-            const target = globalRecords.find(r => r.docId === docId);
-            if(!target) return;
-
-            let nextStatus = 'Bekliyor';
-            if (target.status === 'Bekliyor') nextStatus = 'Tamamlandı';
-            else if (target.status === 'Tamamlandı') nextStatus = 'İade';
-
-            try {
-                await updateDoc(doc(db, "servis_kayitlari", docId), { status: nextStatus });
-                if(context === 'history' && phoneRef) setTimeout(() => openCustomerHistory(phoneRef), 200);
-            } catch (error) { alert("Hata: " + error.message); }
-        };
-
-        // DÜZENLEME PANELİNİ AÇMA
-        window.openEditModal = function(docId, context, phoneRef = '') {
-            const target = globalRecords.find(r => r.docId === docId);
-            if(!target) return;
-
-            document.getElementById('editDocId').value = docId;
-            document.getElementById('editContext').value = context;
-            document.getElementById('editPhoneRef').value = phoneRef;
-            
-            document.getElementById('editInfoText').innerText = `${target.name} - ${target.model}`;
-            document.getElementById('editFault').value = target.fault;
-            document.getElementById('editPrice').value = target.price;
-
-            document.getElementById('editModal').classList.remove('hidden');
-        };
-
-        // Düzenleme Formu Kaydetme
-        document.getElementById('editForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const docId = document.getElementById('editDocId').value;
-            const context = document.getElementById('editContext').value;
-            const phoneRef = document.getElementById('editPhoneRef').value;
-
-            const updatedData = {
-                fault: document.getElementById('editFault').value.trim(),
-                price: document.getElementById('editPrice').value.trim()
-            };
-
-            try {
-                await updateDoc(doc(db, "servis_kayitlari", docId), updatedData);
-                closeEditModal();
-                if(context === 'history' && phoneRef) setTimeout(() => openCustomerHistory(phoneRef), 200);
-            } catch (error) { alert("Güncellenirken hata oluştu: " + error.message); }
-        });
-
-        // Kayıtları Ekrana Basma
-        window.renderRecords = function(filterText = '') {
-            const container = document.getElementById('recordsListContainer');
-            const filtered = globalRecords.filter(r => r.name.toLowerCase().includes(filterText.toLowerCase()) || r.model.toLowerCase().includes(filterText.toLowerCase()) || r.id.toLowerCase().includes(filterText.toLowerCase()) || r.fault.toLowerCase().includes(filterText.toLowerCase()));
-            if(filtered.length === 0) {
-                container.innerHTML = `<div class="bg-white p-8 rounded-2xl text-center text-gray-400 border border-gray-200"><i class="fa-solid fa-folder-open text-3xl mb-2 text-gray-300"></i><p class="text-sm">Cihaz bulunamadı.</p></div>`;
-                return;
+        function initDatabase() {
+            const localData = localStorage.getItem('kuzey_records');
+            if (localData) {
+                records = JSON.parse(localData);
+            } else {
+                records = initialMockData;
+                localStorage.setItem('kuzey_records', JSON.stringify(records));
             }
-            container.innerHTML = filtered.map(r => {
-                let statusColor = 'bg-amber-100 text-amber-700';
-                if(r.status === 'Tamamlandı') statusColor = 'bg-green-100 text-green-700';
-                if(r.status === 'İade') statusColor = 'bg-gray-100 text-gray-600';
+            renderAll();
+        }
 
-                return `
-                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-200 space-y-3">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <span class="text-[10px] font-mono font-bold bg-gray-100 text-gray-600 px-2 py-0.5 rounded">${r.id}</span>
-                            <h3 class="font-bold text-gray-800 mt-1">${r.name}</h3>
-                            <p class="text-xs text-gray-500 font-mono mt-0.5 flex items-center text-gray-400"><i class="fa-solid fa-phone text-[10px] mr-1"></i>${r.phone}</p>
-                            <p class="text-xs text-red-600 font-bold mt-1 bg-red-50 inline-block px-2 py-0.5 rounded-lg">${r.model}</p>
-                        </div>
-                        <span class="text-xs px-2.5 py-1 rounded-full font-bold ${statusColor}">${r.status}</span>
-                    </div>
-                    <div class="text-xs text-gray-600 bg-gray-50 p-2.5 rounded-xl border border-gray-100"><strong>Arıza/İşlem:</strong> ${r.fault}</div>
-                    <div class="flex justify-between items-center text-xs text-gray-500"><span><i class="fa-regular fa-clock mr-1"></i>${r.date}</span><span class="font-bold text-gray-800 text-sm">${r.price} TL</span></div>
-                    <div class="grid grid-cols-3 gap-2 pt-1 border-t border-gray-100">
-                        <button onclick="toggleStatus('${r.docId}', 'record')" class="text-[11px] bg-gray-50 hover:bg-gray-100 text-gray-700 font-bold py-2 rounded-lg border border-gray-200">Durum</button>
-                        <button onclick="openEditModal('${r.docId}', 'record')" class="text-[11px] bg-blue-50 text-blue-600 font-bold py-2 rounded-lg border border-blue-100 flex justify-center items-center"><i class="fa-solid fa-pen-to-square mr-1"></i>Düzenle</button>
-                        <button onclick="openPrintModalById('${r.id}')" class="text-[11px] bg-red-50 text-red-600 font-bold py-2 rounded-lg flex justify-center items-center"><i class="fa-solid fa-print mr-1"></i> Fiş</button>
-                    </div>
-                </div>`;
-            }).join('');
-        };
-
-        window.renderCustomers = function(filterText = '') {
-            const container = document.getElementById('customersListContainer');
-            const customerMap = {};
-            globalRecords.forEach(r => {
-                const phoneKey = r.phone.replace(/\s+/g, '');
-                if (!customerMap[phoneKey]) customerMap[phoneKey] = { name: r.name, phone: r.phone, count: 0 };
-                customerMap[phoneKey].count++;
+        window.openTab = function(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById('tab-' + tabName).classList.remove('hidden');
+            
+            document.querySelectorAll('nav button').forEach(el => {
+                el.classList.remove('text-red-600');
+                el.classList.add('text-gray-400');
             });
-            const customerList = Object.values(customerMap).filter(c => c.name.toLowerCase().includes(filterText.toLowerCase()) || c.phone.includes(filterText));
-            if(customerList.length === 0) {
-                container.innerHTML = `<div class="bg-white p-8 rounded-2xl text-center text-gray-400 border border-gray-200"><i class="fa-solid fa-users-slash text-3xl mb-2 text-gray-300"></i><p class="text-sm">Müşteri bulunamadı.</p></div>`;
-                return;
+            const activeNav = document.getElementById('nav-' + tabName);
+            if (activeNav) {
+                activeNav.classList.remove('text-gray-400');
+                activeNav.classList.add('text-red-600');
             }
-            container.innerHTML = customerList.map(c => `
-                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 flex justify-between items-center">
-                    <div><h4 class="font-bold text-gray-800">${c.name}</h4><p class="text-xs font-mono text-gray-500 mt-0.5">${c.phone}</p></div>
-                    <button onclick="openCustomerHistory('${c.phone}')" class="text-xs bg-red-600 text-white font-bold px-3 py-2 rounded-lg shadow-sm">${c.count} Cihaz <i class="fa-solid fa-chevron-right ml-1 text-[10px]"></i></button>
-                </div>`).join('');
+
+            if(tabName === 'cihazlar' || tabName === 'musteriler' || tabName === 'kasa') {
+                renderAll();
+            }
         };
 
-        window.openCustomerHistory = function(phone) {
-            const customerRecords = globalRecords.filter(r => r.phone.replace(/\s+/g, '') === phone.replace(/\s+/g, ''));
-            if(customerRecords.length === 0) return;
-            document.getElementById('historyModalTitle').innerText = customerRecords[0].name;
-            document.getElementById('historyModalSub').innerText = customerRecords[0].phone;
-            document.getElementById('historyModalContent').innerHTML = customerRecords.map(r => {
-                let statusColor = 'text-amber-600';
-                if(r.status === 'Tamamlandı') statusColor = 'text-green-600';
-                if(r.status === 'İade') statusColor = 'text-gray-500';
-
-                return `
-                <div class="border p-3 rounded-xl bg-gray-50 space-y-2 text-xs">
-                    <div class="flex justify-between items-center"><span class="font-mono font-bold text-gray-500 bg-white border px-1.5 py-0.5 rounded">${r.id}</span><span class="font-bold ${statusColor}">${r.status}</span></div>
-                    <p><strong>Cihaz:</strong> ${r.model}</p><p><strong>Arıza/İşlem:</strong> ${r.fault}</p>
-                    <div class="flex justify-between items-center pt-1 border-t border-dashed text-gray-500"><span>${r.date}</span><span class="font-bold text-gray-800">${r.price} TL</span></div>
-                    <div class="grid grid-cols-2 gap-2 pt-1">
-                        <button onclick="toggleStatus('${r.docId}', 'history', '${phone}')" class="bg-white border text-[11px] font-bold py-1 rounded text-gray-600 shadow-sm">Durum</button>
-                        <button onclick="openEditModal('${r.docId}', 'history', '${phone}')" class="bg-blue-50 border border-blue-100 text-[11px] font-bold py-1 rounded text-blue-600 shadow-sm">Düzenle</button>
-                    </div>
-                </div>`;
-            }).join('');
-            document.getElementById('historyModal').classList.remove('hidden');
-        };
-
-        // RAPORLAMA VE GRAFİK MANTIĞI
-        window.generateReport = function() {
-            const startVal = document.getElementById('reportStartDate').value;
-            const endVal = document.getElementById('reportEndDate').value;
-            if(!startVal || !endVal) return;
-
-            const startStr = startVal + " 00:00";
-            const endStr = endVal + " 23:59";
-
-            const filtered = globalRecords.filter(r => r.date >= startStr && r.date <= endStr);
-
-            let totalRevenue = 0;
-            let successDevicesCount = 0;
-            const dailyData = {};
-
-            filtered.forEach(r => {
-                if (r.status !== 'İade') {
-                    const priceNum = parseFloat(r.price) || 0;
-                    totalRevenue += priceNum;
-                    const dayKey = r.date.split(' ')[0]; 
-                    dailyData[dayKey] = (dailyData[dayKey] || 0) + priceNum;
-                    successDevicesCount++;
-                }
-            });
-
-            document.getElementById('totalRevenueText').innerText = totalRevenue.toLocaleString('tr-TR') + " TL";
-            document.getElementById('totalDevicesText').innerText = successDevicesCount + " Adet";
-
-            const sortedDays = Object.keys(dailyData).sort();
-            const chartLabels = sortedDays.map(d => {
-                const parts = d.split('-');
-                return parts[2] + "/" + parts[1];
-            });
-            const chartValues = sortedDays.map(d => dailyData[d]);
-
-            const ctx = document.getElementById('revenueChart').getContext('2d');
-            if (myChart) myChart.destroy();
-
-            myChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: chartLabels,
-                    datasets: [{
-                        label: 'Net Ciro',
-                        data: chartValues,
-                        backgroundColor: '#dc2626',
-                        borderRadius: 8,
-                        borderSkipped: false
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        y: { beginAtZero: true, grid: { color: '#f3f4f6' } },
-                        x: { grid: { display: false } }
-                    }
-                }
-            });
-        };
-
-        window.setReportRange = function(type) {
+        window.saveRecord = function(e) {
+            e.preventDefault();
+            
+            const customer = document.getElementById('mName').value.trim();
+            const tel = document.getElementById('mTel').value.trim().replace(/\s+/g, '');
+            const device = document.getElementById('mDevice').value.trim();
+            const price = parseFloat(document.getElementById('mPrice').value) || 0;
+            const problem = document.getElementById('mProblem').value.trim();
+            
             const now = new Date();
-            let start = new Date();
-            let end = new Date();
-            if (type === 'today') { start = now; end = now; } 
-            else if (type === 'week') {
-                const currentDay = now.getDay();
-                const distanceToMonday = currentDay === 0 ? 6 : currentDay - 1; 
-                start.setDate(now.getDate() - distanceToMonday);
-            } else if (type === 'month') { start = new Date(now.getFullYear(), now.getMonth(), 1); }
+            const dateStr = now.getFullYear() + '-' + 
+                            String(now.getMonth() + 1).padStart(2, '0') + '-' + 
+                            String(now.getDate()).padStart(2, '0') + ' ' + 
+                            String(now.getHours()).padStart(2, '0') + ':' + 
+                            String(now.getMinutes()).padStart(2, '0');
+            
+            const randomId = 'KZY-' + Math.floor(100000 + Math.random() * 900000);
 
-            const toISOStringLocalDate = (date) => {
-                const offset = date.getTimezoneOffset();
-                const localDate = new Date(date.getTime() - (offset * 60 * 1000));
-                return localDate.toISOString().split('T')[0];
+            const newRecord = {
+                id: randomId,
+                date: dateStr,
+                customer: customer,
+                tel: tel,
+                device: device,
+                problem: problem,
+                price: price,
+                status: "Bekliyor",
+                type: "Tahsilat"
             };
-            document.getElementById('reportStartDate').value = toISOStringLocalDate(start);
-            document.getElementById('reportEndDate').value = toISOStringLocalDate(end);
-            generateReport();
+
+            records.unshift(newRecord);
+            localStorage.setItem('kuzey_records', JSON.stringify(records));
+            
+            document.getElementById('serviceForm').reset();
+            openPrintModal(newRecord);
+        };
+
+        window.updateStatus = function(id, newStatus) {
+            const index = records.findIndex(r => r.id === id);
+            if (index !== -1) {
+                records[index].status = newStatus;
+                if (newStatus === 'İade') {
+                    records[index].type = 'İade';
+                } else {
+                    records[index].type = 'Tahsilat';
+                }
+                localStorage.setItem('kuzey_records', JSON.stringify(records));
+                renderAll();
+            }
         };
 
         window.openPrintModal = function(record) {
             document.getElementById('fTarih').innerText = record.date;
             document.getElementById('fNo').innerText = record.id;
-            document.getElementById('fMusteri').innerText = record.name;
-            document.getElementById('fTel').innerText = record.phone;
-            document.getElementById('fCihaz').innerText = record.model;
-            document.getElementById('fAriza').innerText = record.fault;
+            document.getElementById('fMusteri').innerText = record.customer;
+            document.getElementById('fTel').innerText = record.tel;
+            document.getElementById('fCihaz').innerText = record.device;
+            document.getElementById('fAriza').innerText = record.problem;
             document.getElementById('fTutar').innerText = record.price;
+            
             document.getElementById('printModal').classList.remove('hidden');
         };
-        window.openPrintModalById = function(id) {
-            const record = globalRecords.find(r => r.id === id);
-            if(record) openPrintModal(record);
-        };
-        window.initReportsTab = function() {
-            if(!document.getElementById('reportStartDate').value) setReportRange('month');
-            else generateReport();
-        };
-    </script>
 
-    <script>
-        function setNow() {
-            const now = new Date();
-            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-            document.getElementById('entryDate').value = now.toISOString().slice(0, 16);
+        window.closePrintModal = function() {
+            document.getElementById('printModal').classList.add('hidden');
+        };
+
+        window.viewFis = function(id) {
+            const record = records.find(r => r.id === id);
+            if (record) openPrintModal(record);
+        };
+
+        // KOPYALANABİLİR AKILLI PDF & WHATSAPP ENTEGRASYONU (DÜKKAN NUMARASI ENTEGRELİ)
+        window.sendFisPDF = function() {
+            const element = document.getElementById('printReceiptArea');
+            const fisNo = document.getElementById('fNo').innerText || 'SERVIS';
+            const mName = document.getElementById('fMusteri').innerText || 'Degerli Musterimiz';
+            
+            const opt = {
+                margin:       [4, 2, 4, 2],
+                filename:     `Kuzey_Iletisim_Fis_${fisNo}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true, logging: false },
+                jsPDF:        { unit: 'mm', format: [80, 160], orientation: 'portrait' }
+            };
+
+            const btn = document.querySelector('button[onclick="sendFisPDF()"]');
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> PDF Üretiliyor...`;
+            btn.disabled = true;
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                btn.innerHTML = originalContent;
+                btn.disabled = false;
+
+                const dukkanNo = "905375890039"; 
+                
+                const mesaj = `📄 *KUZEY İLETİŞİM - DİJİTAL SERVİS FİŞİ PULLER*\n\n` +
+                              `*Müşteri:* ${mName}\n` +
+                              `*Fiş No:* ${fisNo}\n\n` +
+                              `⚠️ _Cihazınıza inen PDF fişi bu sohbete dosya olarak ekleyip, dükkan hattından müşteriye paslayınız._`;
+
+                const wpUrl = `https://api.whatsapp.com/send?phone=${dukkanNo}&text=${encodeURIComponent(mesaj)}`;
+                window.open(wpUrl, '_blank');
+            }).catch(err => {
+                alert("PDF Hatası: " + err);
+                btn.innerHTML = originalContent;
+                btn.disabled = false;
+            });
+        };
+
+        window.filterRecords = function() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            renderCardList(query);
+        };
+
+        function renderAll() {
+            renderCardList('');
+            renderCustomers();
+            renderFinance();
         }
 
-        function switchTab(tabId, titleText) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.getElementById('tab-' + tabId).classList.remove('hidden');
-            document.getElementById('pageTitle').innerText = titleText;
+        function renderCardList(query = '') {
+            const container = document.getElementById('cardsContainer');
+            if (!container) return;
+            container.innerHTML = '';
 
-            const tabs = ['new-record', 'records-list', 'customers-list', 'reports'];
-            tabs.forEach(t => {
-                const btn = document.getElementById('btn-tab-' + t);
-                if(t === tabId) {
-                    btn.classList.add('text-red-600', 'font-bold');
-                    btn.classList.remove('text-gray-400', 'font-semibold');
-                } else {
-                    btn.classList.remove('text-red-600', 'font-bold');
-                    btn.classList.add('text-gray-400', 'font-semibold');
+            const filtered = records.filter(r => {
+                return r.customer.toLowerCase().includes(query) || 
+                       r.device.toLowerCase().includes(query) || 
+                       r.problem.toLowerCase().includes(query) || 
+                       r.id.toLowerCase().includes(query);
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="text-center py-8 text-gray-400 text-xs font-medium"><i class="fa-solid fa-folder-open text-xl mb-1 block"></i> Eşleşen kayıt bulunamadı.</div>`;
+                return;
+            }
+
+            filtered.forEach(r => {
+                let statusBadge = '';
+                if(r.status === 'Bekliyor') statusBadge = `<span class="bg-amber-100 text-amber-800 text-[11px] font-bold px-2.5 py-1 rounded-lg">Bekliyor</span>`;
+                else if(r.status === 'Tamamlandı') statusBadge = `<span class="bg-green-100 text-green-800 text-[11px] font-bold px-2.5 py-1 rounded-lg">Tamamlandı</span>`;
+                else if(r.status === 'İade') statusBadge = `<span class="bg-gray-100 text-gray-800 text-[11px] font-bold px-2.5 py-1 rounded-lg">İade Edildi</span>`;
+
+                const card = document.createElement('div');
+                card.className = "bg-white border border-gray-100 p-4 rounded-2xl shadow-sm space-y-3";
+                card.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="text-[10px] text-gray-400 font-mono block">${r.id} | ${r.date}</span>
+                            <h4 class="font-bold text-gray-800 text-sm mt-0.5">${r.customer}</h4>
+                            <p class="text-xs text-gray-500 font-medium"><i class="fa-solid fa-mobile-screen-button text-gray-400 mr-0.5"></i> ${r.device}</p>
+                        </div>
+                        ${statusBadge}
+                    </div>
+                    <div class="bg-gray-50 p-2.5 rounded-xl text-xs font-medium text-gray-600 border border-gray-100/50">
+                        <span class="text-[10px] text-gray-400 block uppercase font-bold tracking-wider mb-0.5">Arıza / İşlem</span>
+                        ${r.problem}
+                    </div>
+                    <div class="flex justify-between items-center pt-1 border-t border-gray-50">
+                        <span class="font-extrabold text-gray-900 text-sm">${r.price} TL</span>
+                        <div class="flex gap-1.5">
+                            <button onclick="viewFis('${r.id}')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold px-3 py-2 rounded-xl text-xs flex items-center gap-1 transition-all">
+                                <i class="fa-solid fa-receipt text-gray-500"></i> Fiş
+                            </button>
+                            <select onchange="updateStatus('${r.id}', this.value)" class="bg-gray-900 text-white font-bold px-2.5 py-2 rounded-xl text-xs focus:outline-none cursor-pointer">
+                                <option value="Bekliyor" ${r.status === 'Bekliyor' ? 'selected' : ''}>Bekliyor</option>
+                                <option value="Tamamlandı" ${r.status === 'Tamamlandı' ? 'selected' : ''}>Tamamlandı</option>
+                                <option value="İade" ${r.status === 'İade' ? 'selected' : ''}>İade</option>
+                            </select>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function renderCustomers() {
+            const container = document.getElementById('customersContainer');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const uniqueCustomers = {};
+            records.forEach(r => {
+                if (!uniqueCustomers[r.tel]) {
+                    uniqueCustomers[r.tel] = { name: r.customer, devices: [] };
+                }
+                if (!uniqueCustomers[r.tel].devices.includes(r.device)) {
+                    uniqueCustomers[r.tel].devices.push(r.device);
                 }
             });
 
-            if(tabId === 'records-list' && window.renderRecords) window.renderRecords();
-            if(tabId === 'customers-list' && window.renderCustomers) window.renderCustomers();
-            if(tabId === 'reports' && window.initReportsTab) window.initReportsTab();
+            const keys = Object.keys(uniqueCustomers);
+            if(keys.length === 0) {
+                container.innerHTML = `<div class="text-center py-8 text-gray-400 text-xs font-medium">Müşteri kaydı bulunmuyor.</div>`;
+                return;
+            }
+
+            keys.forEach(tel => {
+                const data = uniqueCustomers[tel];
+                const item = document.createElement('div');
+                item.className = "bg-white border border-gray-100 p-3.5 rounded-xl shadow-sm flex justify-between items-center";
+                item.innerHTML = `
+                    <div>
+                        <h4 class="font-bold text-gray-800 text-sm">${data.name}</h4>
+                        <p class="text-xs text-gray-400 font-mono mt-0.5"><i class="fa-solid fa-phone text-[10px] mr-0.5"></i> ${tel}</p>
+                        <p class="text-[11px] text-red-600 font-medium mt-1">Cihazlar: ${data.devices.join(', ')}</p>
+                    </div>
+                    <a href="tel:${tel}" class="w-9 h-9 bg-green-50 text-green-600 rounded-full flex items-center justify-center text-sm active:scale-90 transition-all shadow-sm">
+                        <i class="fa-solid fa-phone"></i>
+                    </a>
+                `;
+                container.appendChild(item);
+            });
         }
 
-        function closePrintModal() { document.getElementById('printModal').classList.add('hidden'); }
-        function closeHistoryModal() { document.getElementById('historyModal').classList.add('hidden'); if(window.renderCustomers && !document.getElementById('tab-customers-list').classList.contains('hidden')) window.renderCustomers(); }
-        function closeEditModal() { document.getElementById('editModal').classList.add('hidden'); }
+        function renderFinance() {
+            const logContainer = document.getElementById('financialLogsContainer');
+            if (!logContainer) return;
+            logContainer.innerHTML = '';
 
-        setNow();
+            let todayCiro = 0;
+            let monthCiro = 0;
+            let pendingCount = 0;
+            let completedCount = 0;
+
+            const now = new Date();
+            const todayStr = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+            const monthStr = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+
+            records.forEach(r => {
+                if (r.status === 'Bekliyor') pendingCount++;
+                if (r.status === 'Tamamlandı') completedCount++;
+
+                if (r.status === 'Tamamlandı' && r.type === 'Tahsilat') {
+                    if (r.date.startsWith(todayStr)) todayCiro += r.price;
+                    if (r.date.startsWith(monthStr)) monthCiro += r.price;
+                }
+
+                const isReturn = r.status === 'İade';
+                const logItem = document.createElement('div');
+                logItem.className = `flex justify-between items-center p-3 rounded-xl text-xs border ${isReturn ? 'bg-gray-50 border-gray-200 text-gray-500 line-through' : 'bg-green-50/40 border-green-100 text-gray-800'}`;
+                logItem.innerHTML = `
+                    <div>
+                        <span class="font-bold block">${r.customer}</span>
+                        <span class="text-[10px] text-gray-400 block mt-0.5">${r.device} - ${r.status}</span>
+                    </div>
+                    <span class="font-extrabold ${isReturn ? 'text-gray-400' : 'text-green-700'}">${isReturn ? '-' : '+'}${r.price} TL</span>
+                `;
+                logContainer.appendChild(logItem);
+            });
+
+            document.getElementById('statsTodayCiro').innerText = todayCiro + ' TL';
+            document.getElementById('statsMonthCiro').innerText = monthCiro + ' TL';
+            document.getElementById('statsPendingCount').innerText = pendingCount + ' Adet';
+            document.getElementById('statsCompletedCount').innerText = completedCount + ' Adet';
+        }
+
+        window.addEventListener('DOMContentLoaded', initDatabase);
     </script>
 </body>
 </html>
