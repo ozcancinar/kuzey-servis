@@ -20,7 +20,6 @@
             font-family: 'Inter', sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
-        /* PWA Modu ve Yazdırma Ayarları */
         @media print {
             .no-print { display: none !important; }
             body { background: white; color: black; }
@@ -28,19 +27,21 @@
         }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        /* PDF Hatasını Önleyen Saf Renk Tanımlamaları */
-        #printReceiptArea {
+
+        /* PDF HATASINI ÖNLEYEN SAF VE İZOLE ALAN AYARLARI */
+        .pdf-safari-zone {
             background-color: #ffffff !important;
             color: #000000 !important;
+            font-family: 'Courier New', Courier, monospace !important;
         }
-        #printReceiptArea * {
+        .pdf-safari-zone * {
             color: #000000 !important;
-            border-color: #333333 !important;
+            border-color: #000000 !important;
+            background-color: transparent !important;
         }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-900 antialiased selection:bg-red-500 selection:text-white">
+<body class="bg-gray-50 text-gray-900 antialiased">
 
     <div class="max-w-md mx-auto bg-white min-h-screen shadow-2xl flex flex-col relative pb-20">
         
@@ -54,7 +55,7 @@
                     <p class="text-xs text-red-200 font-medium">Servis Takip Sistemi v2.6</p>
                 </div>
             </div>
-            <button onclick="openTab('kasa')" class="bg-white/10 hover:bg-white/20 text-white font-semibold px-3 py-1.5 rounded-xl text-xs backdrop-blur-md transition-all flex items-center gap-1">
+            <button onclick="openTab('kasa')" class="bg-white/10 hover:bg-white/20 text-white font-semibold px-3 py-1.5 rounded-xl text-xs backdrop-blur-md transition-all flex items-center gap-1 cursor-pointer">
                 <i class="fa-solid fa-chart-pie"></i> Raporlar
             </button>
         </header>
@@ -139,19 +140,19 @@
         </main>
 
         <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white border-t border-gray-100 h-16 flex items-center justify-around px-2 z-40 no-print shadow-[0_-4px_12px_rgba(0,0,0,0.03)]">
-            <button onclick="openTab('yeni')" id="nav-yeni" class="flex flex-col items-center justify-center text-red-600 flex-1 h-full">
+            <button onclick="openTab('yeni')" id="nav-yeni" class="flex flex-col items-center justify-center text-red-600 flex-1 h-full cursor-pointer">
                 <i class="fa-solid fa-square-plus text-xl mb-0.5"></i>
                 <span class="text-[10px] font-bold">Yeni</span>
             </button>
-            <button onclick="openTab('cihazlar')" id="nav-cihazlar" class="flex flex-col items-center justify-center text-gray-400 flex-1 h-full">
+            <button onclick="openTab('cihazlar')" id="nav-cihazlar" class="flex flex-col items-center justify-center text-gray-400 flex-1 h-full cursor-pointer">
                 <i class="fa-solid fa-list-check text-xl mb-0.5"></i>
                 <span class="text-[10px] font-bold">Cihazlar</span>
             </button>
-            <button onclick="openTab('musteriler')" id="nav-musteriler" class="flex flex-col items-center justify-center text-gray-400 flex-1 h-full">
+            <button onclick="openTab('musteriler')" id="nav-musteriler" class="flex flex-col items-center justify-center text-gray-400 flex-1 h-full cursor-pointer">
                 <i class="fa-solid fa-users text-xl mb-0.5"></i>
                 <span class="text-[10px] font-bold">Müşteriler</span>
             </button>
-            <button onclick="openTab('kasa')" id="nav-kasa" class="flex flex-col items-center justify-center text-gray-400 flex-1 h-full">
+            <button onclick="openTab('kasa')" id="nav-kasa" class="flex flex-col items-center justify-center text-gray-400 flex-1 h-full cursor-pointer">
                 <i class="fa-solid fa-wallet text-xl mb-0.5"></i>
                 <span class="text-[10px] font-bold">Kasa</span>
             </button>
@@ -164,12 +165,12 @@
                     <h3 class="font-bold text-gray-800 text-sm flex items-center gap-1.5">
                         <i class="fa-solid fa-receipt text-red-600"></i> Servis Alındı Fişi (80mm)
                     </h3>
-                    <button onclick="closePrintModal()" class="text-gray-400 hover:text-gray-600 text-lg p-1"><i class="fa-solid fa-xmark"></i></button>
+                    <button onclick="closePrintModal()" class="text-gray-400 hover:text-gray-600 text-lg p-1 cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
                 </div>
 
-                <div class="flex-1 overflow-y-auto no-scrollbar border border-gray-100 p-2 rounded-2xl bg-white">
-                    <div id="printReceiptArea" style="width: 100%; max-width: 80mm; padding: 15px; font-family: 'Courier New', Courier, monospace; font-size: 12px; line-height: 1.4;">
-                        <div style="text-center: center; text-align: center; border-bottom: 1px dashed #000000; padding-bottom: 10px; margin-bottom: 10px;">
+                <div class="flex-1 overflow-y-auto no-scrollbar border border-gray-100 p-2 rounded-2xl bg-white mb-2">
+                    <div id="printReceiptArea" class="pdf-safari-zone" style="width: 100%; max-width: 80mm; padding: 15px; font-size: 12px; line-height: 1.4;">
+                        <div style="text-align: center; border-bottom: 1px dashed #000000; padding-bottom: 10px; margin-bottom: 10px;">
                             <h2 style="font-size: 15px; font-weight: bold; margin: 0 0 4px 0;">KUZEY TEKNİK</h2>
                             <p style="font-size: 11px; margin: 0;">Teknik Servis Alındı Belgesi</p>
                         </div>
@@ -193,7 +194,7 @@
                     </div>
                 </div>
 
-                <div class="flex flex-col gap-2 pt-3 mt-2 border-t border-gray-100">
+                <div class="flex flex-col gap-2 pt-2 border-t border-gray-100">
                     <div class="grid grid-cols-2 gap-2">
                         <button onclick="closePrintModal()" class="bg-gray-100 text-gray-700 font-bold py-3 rounded-xl text-sm transition-all active:scale-95 cursor-pointer">
                             Kapat
@@ -203,7 +204,7 @@
                         </button>
                     </div>
                     
-                    <button onclick="sendFisPDF()" style="background-color: #16a34a !important; color: #ffffff !important;" class="text-white font-bold py-3.5 rounded-xl text-sm flex justify-center items-center gap-2 shadow-md transition-all active:scale-95 w-full cursor-pointer">
+                    <button id="wpSendBtn" onclick="sendFisPDF()" style="background-color: #16a34a !important; color: #ffffff !important;" class="text-white font-bold py-3.5 rounded-xl text-sm flex justify-center items-center gap-2 shadow-md transition-all active:scale-95 w-full cursor-pointer">
                         <i class="fa-brands fa-whatsapp text-lg"></i> WhatsApp PDF ile Gönder
                     </button>
                 </div>
@@ -211,6 +212,32 @@
             </div>
         </div>
 
+    </div>
+
+    <div style="position: absolute; left: -9999px; top: -9999px; overflow: hidden; width: 0; height: 0;">
+        <div id="isolatedPdfArea" class="pdf-safari-zone" style="width: 80mm; padding: 15px; font-size: 12px; line-height: 1.4; background-color: #ffffff;">
+            <div style="text-align: center; border-bottom: 1px dashed #000000; padding-bottom: 10px; margin-bottom: 10px;">
+                <h2 style="font-size: 15px; font-weight: bold; margin: 0 0 4px 0;">KUZEY TEKNİK</h2>
+                <p style="font-size: 11px; margin: 0;">Teknik Servis Alındı Belgesi</p>
+            </div>
+            <div style="margin-bottom: 10px;">
+                <p style="margin: 3px 0;"><strong>Tarih:</strong> <span id="pdfTarih"></span></p>
+                <p style="margin: 3px 0;"><strong>Fiş No:</strong> <span id="pdfNo" style="font-weight: bold;"></span></p>
+                <div style="border-bottom: 1px dashed #000000; margin: 8px 0;"></div>
+                <p style="margin: 3px 0;"><strong>Müşteri:</strong> <span id="pdfMusteri"></span></p>
+                <p style="margin: 3px 0;"><strong>Tel:</strong> <span id="pdfTel"></span></p>
+                <p style="margin: 3px 0;"><strong>Cihaz:</strong> <span id="pdfCihaz"></span></p>
+                <p style="margin: 3px 0;"><strong>Arıza:</strong> <span id="pdfAriza"></span></p>
+                <div style="border-bottom: 1px dashed #000000; margin: 8px 0;"></div>
+                <p style="text-align: right; font-weight: bold; font-size: 14px; margin: 5px 0;">Fiyat: <span id="pdfTutar"></span> TL</p>
+            </div>
+            <div style="text-align: center; border-top: 1px dashed #000000; padding-top: 10px; margin-top: 10px; font-size: 10px;">
+                <p style="margin: 2px 0;">Cihaz tesliminde fiş ibrazı zorunludur.</p>
+                <p style="font-weight: bold; margin: 2px 0;">Güvenilir Teknik Servis!</p>
+                <p style="margin: 2px 0;">@kuzeyiletisim</p>
+                <p style="margin: 2px 0;">0537 589 00 39</p>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -303,6 +330,14 @@
             document.getElementById('fCihaz').innerText = record.device;
             document.getElementById('fAriza').innerText = record.problem;
             document.getElementById('fTutar').innerText = record.price;
+
+            document.getElementById('pdfTarih').innerText = record.date;
+            document.getElementById('pdfNo').innerText = record.id;
+            document.getElementById('pdfMusteri').innerText = record.customer;
+            document.getElementById('pdfTel').innerText = record.tel;
+            document.getElementById('pdfCihaz').innerText = record.device;
+            document.getElementById('pdfAriza').innerText = record.problem;
+            document.getElementById('pdfTutar').innerText = record.price;
             
             document.getElementById('printModal').classList.remove('hidden');
         };
@@ -316,24 +351,22 @@
             if (record) openPrintModal(record);
         };
 
-        // SAF CSS YAPILANDIRMASI İLE HATASIZ PDF OLUŞTURMA MOTORU
         window.sendFisPDF = function() {
-            const element = document.getElementById('printReceiptArea');
-            const fisNo = document.getElementById('fNo').innerText || 'SERVIS';
-            const mName = document.getElementById('fMusteri').innerText || 'Musterimiz';
+            const element = document.getElementById('isolatedPdfArea');
+            const fisNo = document.getElementById('pdfNo').innerText || 'SERVIS';
+            const mName = document.getElementById('pdfMusteri').innerText || 'Musterimiz';
             
-            // html2pdf için oklch çökmelerini önleyen temiz ayar kümesi
             const opt = {
-                margin:       [5, 4, 5, 4],
+                margin:       [8, 6, 8, 6],
                 filename:     `Kuzey_Iletisim_Fis_${fisNo}.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
                 html2canvas:  { scale: 2, useCORS: true, logging: false },
-                jsPDF:        { unit: 'mm', format: [80, 150], orientation: 'portrait' }
+                jsPDF:        { unit: 'mm', format: [80, 160], orientation: 'portrait' }
             };
 
-            const btn = document.querySelector('button[onclick="sendFisPDF()"]');
+            const btn = document.getElementById('wpSendBtn');
             const originalContent = btn.innerHTML;
-            btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Dosya Hazırlanıyor...`;
+            btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Hazırlanıyor...`;
             btn.disabled = true;
 
             html2pdf().set(opt).from(element).save().then(() => {
@@ -349,7 +382,7 @@
                 const wpUrl = `https://api.whatsapp.com/send?phone=${dukkanNo}&text=${encodeURIComponent(mesaj)}`;
                 window.open(wpUrl, '_blank');
             }).catch(err => {
-                alert("Sistem Hatası Giderilemedi: " + err);
+                alert("PDF oluşturulamadı: " + err);
                 btn.innerHTML = originalContent;
                 btn.disabled = false;
             });
@@ -405,7 +438,7 @@
                     <div class="flex justify-between items-center pt-2 border-t border-gray-50">
                         <span class="font-extrabold text-gray-900 text-sm">${r.price} TL</span>
                         <div class="flex gap-1.5">
-                            <button onclick="viewFis('${r.id}')" class="bg-gray-100 text-gray-700 font-bold px-3 py-2 rounded-xl text-xs flex items-center gap-1">
+                            <button onclick="viewFis('${r.id}')" class="bg-gray-100 text-gray-700 font-bold px-3 py-2 rounded-xl text-xs flex items-center gap-1 cursor-pointer">
                                 <i class="fa-solid fa-receipt text-gray-500"></i> Fiş
                             </button>
                             <select onchange="updateStatus('${r.id}', this.value)" class="bg-gray-900 text-white font-bold px-2 py-2 rounded-xl text-xs cursor-pointer">
