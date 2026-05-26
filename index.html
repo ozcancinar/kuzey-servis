@@ -12,7 +12,6 @@
             #prizone, #prizone * { visibility: visible; }
             #prizone { position: absolute; left: 0; top: 0; width: 80mm; }
         }
-        /* Alt menünün telefon çentiğine takılmaması için alt boşluk */
         .safe-bottom { padding-bottom: calc(env(safe-area-inset-bottom) + 4rem); }
     </style>
 </head>
@@ -71,9 +70,7 @@
                 <i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-gray-400"></i>
                 <input type="text" id="searchRecords" placeholder="İsim, cihaz, arıza veya ID ile ara..." class="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl shadow-sm outline-none focus:border-red-500">
             </div>
-            
-            <div id="recordsListContainer" class="space-y-3">
-                </div>
+            <div id="recordsListContainer" class="space-y-3"></div>
         </section>
 
         <section id="tab-customers-list" class="space-y-4 tab-content hidden">
@@ -81,9 +78,7 @@
                 <i class="fa-solid fa-user-gear absolute left-4 top-3.5 text-gray-400"></i>
                 <input type="text" id="searchCustomers" placeholder="Müşteri ismi veya telefon yazın..." class="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl shadow-sm outline-none focus:border-red-500">
             </div>
-
-            <div id="customersListContainer" class="space-y-2">
-                </div>
+            <div id="customersListContainer" class="space-y-2"></div>
         </section>
 
     </main>
@@ -91,7 +86,7 @@
     <div id="printModal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl space-y-4">
             <div class="flex justify-between items-center border-b pb-2">
-                <span class="font-bold text-gray-800">Servis Alındı Fişi</span>
+                <span class="font-bold text-gray-800">Servis Alındı Fişi (80mm)</span>
                 <button onclick="closePrintModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
             </div>
             
@@ -139,8 +134,7 @@
                 </div>
                 <button onclick="closeHistoryModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
             </div>
-            <div id="historyModalContent" class="space-y-3 overflow-y-auto pr-1 flex-1">
-                </div>
+            <div id="historyModalContent" class="space-y-3 overflow-y-auto pr-1 flex-1"></div>
             <button onclick="closeHistoryModal()" class="w-full mt-4 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-2.5 rounded-xl text-sm">Pencereyi Kapat</button>
         </div>
     </div>
@@ -162,40 +156,45 @@
         </div>
     </nav>
 
-    <script>
-        let records = JSON.parse(localStorage.getItem('kuzey_records')) || [];
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        function setNow() {
-            const now = new Date();
-            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-            document.getElementById('entryDate').value = now.toISOString().slice(0, 16);
-        }
+        // Senin Firebase Şifrelerin
+        const firebaseConfig = {
+          apiKey: "AIzaSyAvfzwlLNv8K71NLLMo-nEQt2ESQEXXuxI",
+          authDomain: "kuzey-servis.firebaseapp.com",
+          projectId: "kuzey-servis",
+          storageBucket: "kuzey-servis.firebasestorage.app",
+          messagingSenderId: "190809402093",
+          appId: "1:190809402093:web:cfb45dfcd139569cfb3ae4"
+        };
 
-        // Sekme Değiştirici Fonksiyon
-        function switchTab(tabId, titleText) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.getElementById('tab-' + tabId).classList.remove('hidden');
-            document.getElementById('pageTitle').innerText = titleText;
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const recordsCol = collection(db, "servis_kayitlari");
 
-            // Buton renklerini sıfırla/güncelle
-            const tabs = ['new-record', 'records-list', 'customers-list'];
-            tabs.forEach(t => {
-                const btn = document.getElementById('btn-tab-' + t);
-                if(t === tabId) {
-                    btn.classList.add('text-red-600', 'font-bold');
-                    btn.classList.remove('text-gray-400', 'font-semibold');
-                } else {
-                    btn.classList.remove('text-red-600', 'font-bold');
-                    btn.classList.add('text-gray-400', 'font-semibold');
-                }
+        let globalRecords = [];
+
+        // CANLI VERİ DİNLEYİCİSİ (3 cihazda da aynı anda çalışmayı sağlar)
+        const q = query(recordsCol, orderBy("timestamp", "desc"));
+        onSnapshot(q, (snapshot) => {
+            globalRecords = [];
+            snapshot.forEach((doc) => {
+                globalRecords.push({ docId: doc.id, ...doc.data() });
             });
+            
+            // Ekranları anlık güncelle
+            if(!document.getElementById('tab-records-list').classList.contains('hidden')) {
+                renderRecords(document.getElementById('searchRecords').value);
+            }
+            if(!document.getElementById('tab-customers-list').classList.contains('hidden')) {
+                renderCustomers(document.getElementById('searchCustomers').value);
+            }
+        });
 
-            if(tabId === 'records-list') renderRecords();
-            if(tabId === 'customers-list') renderCustomers();
-        }
-
-        // Yeni Kayıt İşlemi
-        document.getElementById('recordForm').addEventListener('submit', function(e) {
+        // Form Gönderme (Firebase'e Kayıt)
+        document.getElementById('recordForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const newRecord = {
@@ -206,21 +205,42 @@
                 fault: document.getElementById('deviceFault').value.trim(),
                 price: document.getElementById('price').value || '0',
                 date: document.getElementById('entryDate').value.replace('T', ' '),
-                status: 'Bekliyor'
+                status: 'Bekliyor',
+                timestamp: Date.now()
             };
 
-            records.unshift(newRecord);
-            localStorage.setItem('kuzey_records', JSON.stringify(records));
-            
-            this.reset();
-            setNow();
-            openPrintModal(newRecord);
+            try {
+                await addDoc(recordsCol, newRecord);
+                this.reset();
+                setNow();
+                openPrintModal(newRecord);
+            } catch (error) {
+                alert("Kayıt veritabanına eklenirken hata oluştu: " + error.message);
+            }
         });
 
-        // Kayıt Listesini Basma
-        function renderRecords(filterText = '') {
+        // Durum Değiştirme Fonksiyonu (Canlı Güncelleme)
+        window.toggleStatus = async function(docId, context, phoneRef = '') {
+            const target = globalRecords.find(r => r.docId === docId);
+            if(!target) return;
+
+            const newStatus = target.status === 'Bekliyor' ? 'Tamamlandı' : 'Bekliyor';
+            const docRef = doc(db, "servis_kayitlari", docId);
+            
+            try {
+                await updateDoc(docRef, { status: newStatus });
+                if(context === 'history' && phoneRef) {
+                    setTimeout(() => openCustomerHistory(phoneRef), 200);
+                }
+            } catch (error) {
+                alert("Durum güncellenirken hata oluştu: " + error.message);
+            }
+        };
+
+        // Kayıtları Ekrana Basma
+        window.renderRecords = function(filterText = '') {
             const container = document.getElementById('recordsListContainer');
-            const filtered = records.filter(r => 
+            const filtered = globalRecords.filter(r => 
                 r.name.toLowerCase().includes(filterText.toLowerCase()) || 
                 r.model.toLowerCase().includes(filterText.toLowerCase()) ||
                 r.id.toLowerCase().includes(filterText.toLowerCase()) ||
@@ -229,7 +249,7 @@
 
             if(filtered.length === 0) {
                 container.innerHTML = `<div class="bg-white p-8 rounded-2xl text-center text-gray-400 border border-gray-200">
-                    <i class="fa-solid fa-folder-open text-3xl mb-2 text-gray-300"></i><p class="text-sm">Aranan cihaz veya müşteri bulunamadı.</p>
+                    <i class="fa-solid fa-folder-open text-3xl mb-2 text-gray-300"></i><p class="text-sm">Cihaz veya müşteri bulunamadı.</p>
                 </div>`;
                 return;
             }
@@ -255,19 +275,19 @@
                         <span class="font-bold text-gray-800 text-sm">${r.price} TL</span>
                     </div>
                     <div class="grid grid-cols-2 gap-2 pt-1 border-t border-gray-100">
-                        <button onclick="toggleStatus('${r.id}', 'record')" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-2 rounded-lg transition">Durum Değiştir</button>
+                        <button onclick="toggleStatus('${r.docId}', 'record')" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-2 rounded-lg transition">Durum Değiştir</button>
                         <button onclick="openPrintModalById('${r.id}')" class="text-xs bg-red-50 text-red-600 font-bold py-2 rounded-lg transition flex justify-center items-center"><i class="fa-solid fa-print mr-1"></i> Fiş</button>
                     </div>
                 </div>
             `).join('');
-        }
+        };
 
-        // Benzersiz Müşteri Listesini Oluşturma ve Filtreleme
-        function renderCustomers(filterText = '') {
+        // Müşteri Havuzunu Ekrana Basma
+        window.renderCustomers = function(filterText = '') {
             const container = document.getElementById('customersListContainer');
-            
             const customerMap = {};
-            records.forEach(r => {
+            
+            globalRecords.forEach(r => {
                 const phoneKey = r.phone.replace(/\s+/g, '');
                 if (!customerMap[phoneKey]) {
                     customerMap[phoneKey] = { name: r.name, phone: r.phone, count: 0 };
@@ -298,11 +318,11 @@
                     </button>
                 </div>
             `).join('');
-        }
+        };
 
-        // Müşterinin Cihaz Geçmişini Gösteren Modal Penceresi
-        function openCustomerHistory(phone) {
-            const customerRecords = records.filter(r => r.phone.replace(/\s+/g, '') === phone.replace(/\s+/g, ''));
+        // Müşteri Geçmişi Modalını Açma
+        window.openCustomerHistory = function(phone) {
+            const customerRecords = globalRecords.filter(r => r.phone.replace(/\s+/g, '') === phone.replace(/\s+/g, ''));
             if(customerRecords.length === 0) return;
 
             document.getElementById('historyModalTitle').innerText = customerRecords[0].name;
@@ -321,26 +341,15 @@
                         <span>${r.date}</span>
                         <span class="font-bold text-gray-800">${r.price} TL</span>
                     </div>
-                    <button onclick="toggleStatus('${r.id}', 'history', '${phone}')" class="w-full mt-1 bg-white border text-[11px] font-bold py-1 rounded shadow-sm text-gray-600">Durumu Değiştir</button>
+                    <button onclick="toggleStatus('${r.docId}', 'history', '${phone}')" class="w-full mt-1 bg-white border text-[11px] font-bold py-1 rounded shadow-sm text-gray-600">Durumu Değiştir</button>
                 </div>
             `).join('');
 
             document.getElementById('historyModal').classList.remove('hidden');
-        }
+        };
 
-        function toggleStatus(id, context, phoneRef = '') {
-            records = records.map(r => {
-                if(r.id === id) r.status = r.status === 'Bekliyor' ? 'Tamamlandı' : 'Bekliyor';
-                return r;
-            });
-            localStorage.setItem('kuzey_records', JSON.stringify(records));
-            
-            if(context === 'record') renderRecords(document.getElementById('searchRecords').value);
-            if(context === 'history') openCustomerHistory(phoneRef);
-        }
-
-        // Fiş Modalleri Kapatma Açma
-        function openPrintModal(record) {
+        // Fiş Açma Mantığı
+        window.openPrintModal = function(record) {
             document.getElementById('fTarih').innerText = record.date;
             document.getElementById('fNo').innerText = record.id;
             document.getElementById('fMusteri').innerText = record.name;
@@ -349,21 +358,49 @@
             document.getElementById('fAriza').innerText = record.fault;
             document.getElementById('fTutar').innerText = record.price;
             document.getElementById('printModal').classList.remove('hidden');
+        };
+
+        window.openPrintModalById = function(id) {
+            const record = globalRecords.find(r => r.id === id);
+            if(record) openPrintModal(record);
+        };
+
+        // Arama kutuları tetikleyicileri
+        document.getElementById('searchRecords').addEventListener('input', e => renderRecords(e.target.value));
+        document.getElementById('searchCustomers').addEventListener('input', e => renderCustomers(e.target.value));
+    </script>
+
+    <script>
+        function setNow() {
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            document.getElementById('entryDate').value = now.toISOString().slice(0, 16);
         }
 
-        function openPrintModalById(id) {
-            const record = records.find(r => r.id === id);
-            if(record) openPrintModal(record);
+        function switchTab(tabId, titleText) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById('tab-' + tabId).classList.remove('hidden');
+            document.getElementById('pageTitle').innerText = titleText;
+
+            const tabs = ['new-record', 'records-list', 'customers-list'];
+            tabs.forEach(t => {
+                const btn = document.getElementById('btn-tab-' + t);
+                if(t === tabId) {
+                    btn.classList.add('text-red-600', 'font-bold');
+                    btn.classList.remove('text-gray-400', 'font-semibold');
+                } else {
+                    btn.classList.remove('text-red-600', 'font-bold');
+                    btn.classList.add('text-gray-400', 'font-semibold');
+                }
+            });
+
+            if(tabId === 'records-list' && window.renderRecords) window.renderRecords();
+            if(tabId === 'customers-list' && window.renderCustomers) window.renderCustomers();
         }
 
         function closePrintModal() { document.getElementById('printModal').classList.add('hidden'); }
-        function closeHistoryModal() { document.getElementById('historyModal').classList.add('hidden'); if(!document.getElementById('tab-customers-list').classList.contains('hidden')) renderCustomers(); }
+        function closeHistoryModal() { document.getElementById('historyModal').classList.add('hidden'); if(window.renderCustomers && !document.getElementById('tab-customers-list').classList.contains('hidden')) window.renderCustomers(); }
 
-        // Anlık Arama Tetikleyicileri
-        document.getElementById('searchRecords').addEventListener('input', e => renderRecords(e.target.value));
-        document.getElementById('searchCustomers').addEventListener('input', e => renderCustomers(e.target.value));
-
-        // İlk Kurulum
         setNow();
     </script>
 </body>
