@@ -3,10 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kuzey İletişim - Teknik Servis Takip</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <title>Kuzey Teknik - Servis Takip</title>
+    
+    <link rel="apple-touch-icon" sizes="180x180" href="https://img.gs/jgkmxkwyfm/180/https://raw.githubusercontent.com/otuncman/kuzey-assets/main/logo.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="https://img.gs/jgkmxkwyfm/32/https://raw.githubusercontent.com/otuncman/kuzey-assets/main/logo.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Kuzey Teknik"> <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <style>
         @media print {
             body * { visibility: hidden; }
@@ -14,13 +20,16 @@
             #prizone { position: absolute; left: 0; top: 0; width: 80mm; }
         }
         .safe-bottom { padding-bottom: calc(env(safe-area-inset-bottom) + 5rem); }
+        /* Kurumsal İkon Tasarımı (iOS/Android için) */
+        :root { --pwa-icon: url('https://raw.githubusercontent.com/otuncman/kuzey-assets/main/logo.png'); }
     </style>
 </head>
 <body class="bg-gray-100 font-sans text-gray-800 antialiased safe-bottom">
 
-    <header class="bg-red-600 text-white p-4 shadow-md flex justify-between items-center sticky top-0 z-40">
-        <h1 class="text-xl font-bold tracking-wider flex items-center">
-            <i class="fa-solid fa-mobile-screen-button mr-2"></i>KUZEY İLETİŞİM
+    <header class="bg-red-600 text-white p-4 shadow-lg flex justify-between items-center sticky top-0 z-40">
+        <h1 class="text-lg font-extrabold tracking-wider flex items-center">
+            <img src="https://raw.githubusercontent.com/otuncman/kuzey-assets/main/logo.png" class="h-6 w-6 mr-2.5 rounded-md shadow-inner" alt="Kuzey Teknik">
+            KUZEY TEKNİK <span class="font-normal text-red-100 text-[10px] ml-1.5 opacity-80">- Servis</span>
         </h1>
         <span id="pageTitle" class="text-xs bg-white text-red-600 px-2.5 py-1 rounded-full font-bold shadow-sm">Yeni Kayıt</span>
     </header>
@@ -137,7 +146,7 @@
             
             <div id="prizone" class="bg-white p-2 font-mono text-xs text-black space-y-3 mx-auto" style="width: 80mm;">
                 <div class="text-center border-b pb-2 border-black border-dashed">
-                    <p class="font-bold text-sm">KUZEY İLETİŞİM</p>
+                    <p class="font-bold text-sm">KUZEY TEKNİK</p>
                     <p class="text-[10px]">Teknik Servis Alındı Belgesi</p>
                 </div>
                 <div class="space-y-1 text-[11px]">
@@ -149,14 +158,14 @@
                     <p><strong>Cihaz:</strong> <span id="fCihaz"></span></p>
                     <p><strong>Arıza:</strong> <span id="fAriza"></span></p>
                     <hr class="border-black border-dashed my-1">
-                    <p class="text-right font-bold text-xs">Tutar: <span id="fTutar"></span> TL</p>
+                    <p><strong>Fiyat:</strong> <span id="fTutar"></span> TL</p>
                 </div>
                 <div class="text-center border-t pt-2 border-black border-dashed text-[10px] leading-tight space-y-1">
                     <p>Cihaz tesliminde fiş ibrazı zorunludur.</p>
-                    <p class="font-bold pt-1">Teşekkür Ederiz!</p>
+                    <p class="font-bold pt-1 opacity-80 text-gray-700">Güvenilir Teknik Servis!</p>
                     <div class="text-[9px] pt-1 text-gray-700 space-y-0.5 font-sans">
-                        <p><i class="fa-brands fa-instagram"></i> instagram @kuzeyiletisim</p>
-                        <p><i class="fa-solid fa-phone"></i> Telefon 0537 589 00 39</p>
+                        <p><i class="fa-brands fa-instagram text-red-600"></i> @kuzeyiletisim</p>
+                        <p><i class="fa-solid fa-phone text-red-600"></i> 0537 589 00 39</p>
                     </div>
                 </div>
             </div>
@@ -218,11 +227,11 @@
         <div class="max-w-md mx-auto grid grid-cols-4 h-16">
             <button onclick="switchTab('new-record', 'Yeni Kayıt')" id="btn-tab-new-record" class="flex flex-col items-center justify-center text-red-600 font-bold transition">
                 <i class="fa-solid fa-square-plus text-lg mb-0.5"></i>
-                <span class="text-[10px]">Yeni Kayıt</span>
+                <span class="text-[10px]">Yeni</span>
             </button>
             <button onclick="switchTab('records-list', 'Kayıt Listesi')" id="btn-tab-records-list" class="flex flex-col items-center justify-center text-gray-400 font-semibold transition">
                 <i class="fa-solid fa-rectangle-list text-lg mb-0.5"></i>
-                <span class="text-[10px]">Kayıtlar</span>
+                <span class="text-[10px]">Cihazlar</span>
             </button>
             <button onclick="switchTab('customers-list', 'Müşteri Havuzu')" id="btn-tab-customers-list" class="flex flex-col items-center justify-center text-gray-400 font-semibold transition">
                 <i class="fa-solid fa-users text-lg mb-0.5"></i>
@@ -230,7 +239,7 @@
             </button>
             <button onclick="switchTab('reports', 'Ciro ve Raporlama')" id="btn-tab-reports" class="flex flex-col items-center justify-center text-gray-400 font-semibold transition">
                 <i class="fa-solid fa-chart-pie text-lg mb-0.5"></i>
-                <span class="text-[10px]">Raporlar</span>
+                <span class="text-[10px]">Kasa</span>
             </button>
         </div>
     </nav>
@@ -289,7 +298,7 @@
             } catch (error) { alert("Hata: " + error.message); }
         });
 
-        // Durum Değiştirme Fonksiyonu (DÖNGÜSEL: Bekliyor -> Tamamlandı -> İade -> Bekliyor)
+        // Durum Değiştirme Fonksiyonu
         window.toggleStatus = async function(docId, context, phoneRef = '') {
             const target = globalRecords.find(r => r.docId === docId);
             if(!target) return;
@@ -427,7 +436,6 @@
             const startStr = startVal + " 00:00";
             const endStr = endVal + " 23:59";
 
-            // Tarih aralığına göre filtrele
             const filtered = globalRecords.filter(r => r.date >= startStr && r.date <= endStr);
 
             let totalRevenue = 0;
@@ -435,17 +443,11 @@
             const dailyData = {};
 
             filtered.forEach(r => {
-                // EĞER CİHAZ İADE İSE CİROYA DAHİL ETME!
                 if (r.status !== 'İade') {
                     const priceNum = parseFloat(r.price) || 0;
                     totalRevenue += priceNum;
-
                     const dayKey = r.date.split(' ')[0]; 
                     dailyData[dayKey] = (dailyData[dayKey] || 0) + priceNum;
-                }
-                
-                // İade olmayan ve bekleyen/tamamlanan işleri adet olarak say
-                if (r.status !== 'İade') {
                     successDevicesCount++;
                 }
             });
